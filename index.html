@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoteSphere - Your Digital Note Space</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .note-card {
+            transition: all 0.3s ease;
+        }
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .alert.show {
+            transform: translateX(0);
+        }
+        .alert.error {
+            background-color: #ef4444;
+        }
+        .alert.success {
+            background-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-sphere text-white text-2xl mr-3"></i>
+                    <span class="text-white text-xl font-bold">NoteSphere</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="userInfo" class="hidden text-white">
+                        <span id="userEmail" class="mr-4"></span>
+                        <button id="logoutBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+                    <div id="authButtons" class="space-x-2">
+                        <button id="loginBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors text-white">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </button>
+                        <button id="registerBtn" class="bg-white hover:bg-opacity-90 px-4 py-2 rounded-lg transition-colors text-purple-600 font-medium">
+                            <i class="fas fa-user-plus mr-2"></i>Register
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Firebase Status -->
+        <div id="firebaseStatus" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <strong>Firebase Configuration Error:</strong> Please check your Firebase setup.
+        </div>
+
+        <!-- Welcome Section -->
+        <div id="welcomeSection" class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to NoteSphere</h1>
+            <p class="text-xl text-gray-600 mb-8">Your personal space for organizing thoughts, ideas, and memories</p>
+            <div class="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
+                <h3 class="text-lg font-semibold mb-4">Get Started</h3>
+                <p class="text-gray-600 mb-4">Sign in to start creating and managing your notes</p>
+                <button id="getStartedBtn" class="gradient-bg text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity w-full">
+                    <i class="fas fa-rocket mr-2"></i>Get Started
+                </button>
+            </div>
+        </div>
+
+        <!-- Notes Dashboard -->
+        <div id="notesDashboard" class="hidden">
+            <!-- Add Note Section -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-plus-circle text-purple-600 mr-2"></i>Create New Note
+                </h2>
+                <form id="noteForm" class="space-y-4">
+                    <div>
+                        <input type="text" id="noteTitle" placeholder="Note Title" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <textarea id="noteContent" placeholder="Write your note here..." rows="4"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"></textarea>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <select id="noteCategory" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="personal">Personal</option>
+                            <option value="work">Work</option>
+                            <option value="ideas">Ideas</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button type="submit" id="addNoteBtn" class="gradient-bg text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+                            <i class="fas fa-save mr-2"></i>Save Note
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <input type="text" id="searchInput" placeholder="Search notes..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <select id="filterCategory" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="all">All Categories</option>
+                        <option value="personal">Personal</option>
+                        <option value="work">Work</option>
+                        <option value="ideas">Ideas</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Notes Grid -->
+            <div id="notesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Notes will be dynamically added here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-12 hidden">
+                <i class="fas fa-sticky-note text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No notes yet</h3>
+                <p class="text-gray-500">Create your first note to get started!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="authTitle" class="text-2xl font-bold text-gray-800">Login</h2>
+                <button id="closeAuthModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="authForm" class="space-y-4">
+                <div>
+                    <input type="email" id="authEmail" placeholder="Email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <input type="password" id="authPassword" placeholder="Password" required minlength="6"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                </div>
+                <button type="submit" id="authSubmitBtn" class="w-full gradient-bg text-white py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center">
+                    <span id="authBtnText">Login</span>
+                    <div id="authLoader" class="loading hidden ml-2"></div>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">
+                    <span id="authSwitchText">Don't have an account?</span>
+                    <button id="authSwitch" class="text-purple-600 hover:text-purple-800 font-medium ml-1">Register</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Edit Note</h2>
+                <button id="closeEditModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="editNoteForm" class="space-y-4">
+                <div>
+                    <input type="text" id="editNoteTitle" placeholder="Note Title" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <textarea id="editNoteContent" placeholder="Write your note here..." rows="6"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <select id="editNoteCategory" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="personal">Personal</option>
+                        <option value="work">Work</option>
+                        <option value="ideas">Ideas</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <div class="space-x-2">
+                        <button type="button" id="cancelEditBtn" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" id="updateNoteBtn" class="gradient-bg text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity">
+                            <i class="fas fa-save mr-2"></i>Update Note
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase and App Script -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_YSovljuHqJBkpt8RdELi1iWdG93AC7U",
+            authDomain: "ead-project-9ba0d.firebaseapp.com",
+            projectId: "ead-project-9ba0d",
+            storageBucket: "ead-project-9ba0d.firebasestorage.app",
+            messagingSenderId: "147896513981",
+            appId: "1:147896513981:web:06934a40c7cc51bbbbced4",
+            measurementId: "G-PQC5LQ3NVX"
+        };
+
+        // Initialize Firebase
+        let app, auth, db;
+        let currentUser = null;
+        let allNotes = [];
+        let editingNoteId = null;
+        let isLoginMode = true;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            // console.log('Firebase initialized successfully');
+        } catch (error) {
+            // console.error('Firebase initialization error:', error);
+            // showAlert('Firebase initialization failed. Please check your configuration.', 'error');
+            document.getElementById('firebaseStatus').classList.remove('hidden');
+        }
+
+        // Utility functions
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            alertContainer.appendChild(alert);
+            
+            // Show alert
+            setTimeout(() => alert.classList.add('show'), 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        function getErrorMessage(errorCode) {
+            const errorMessages = {
+                'auth/user-not-found': 'No account found with this email address.',
+                'auth/wrong-password': 'Incorrect password.',
+                'auth/email-already-in-use': 'An account with this email already exists.',
+                'auth/weak-password': 'Password should be at least 6 characters.',
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/configuration-not-found': 'Firebase Authentication is not properly configured. Please contact support.',
+                'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+                'auth/network-request-failed': 'Network error. Please check your internet connection.'
+            };
+            return errorMessages[errorCode] || 'An error occurred. Please try again.';
+        }
+
+        // DOM elements
+        const welcomeSection = document.getElementById('welcomeSection');
+        const notesDashboard = document.getElementById('notesDashboard');
+        const authModal = document.getElementById('authModal');
+        const editModal = document.getElementById('editModal');
+        const userInfo = document.getElementById('userInfo');
+        const authButtons = document.getElementById('authButtons');
+        const notesContainer = document.getElementById('notesContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        // Authentication event listeners
+        document.getElementById('loginBtn').addEventListener('click', () => showAuthModal(true));
+        document.getElementById('registerBtn').addEventListener('click', () => showAuthModal(false));
+        document.getElementById('getStartedBtn').addEventListener('click', () => showAuthModal(true));
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        document.getElementById('closeAuthModal').addEventListener('click', hideAuthModal);
+        document.getElementById('authSwitch').addEventListener('click', toggleAuthMode);
+        document.getElementById('authForm').addEventListener('submit', handleAuth);
+
+        // Note management event listeners
+        document.getElementById('noteForm').addEventListener('submit', handleAddNote);
+        document.getElementById('searchInput').addEventListener('input', filterNotes);
+        document.getElementById('filterCategory').addEventListener('change', filterNotes);
+        document.getElementById('closeEditModal').addEventListener('click', hideEditModal);
+        document.getElementById('cancelEditBtn').addEventListener('click', hideEditModal);
+        document.getElementById('editNoteForm').addEventListener('submit', handleUpdateNote);
+
+        // Authentication functions
+        function showAuthModal(loginMode) {
+            isLoginMode = loginMode;
+            const title = document.getElementById('authTitle');
+            const submitBtn = document.getElementById('authBtnText');
+            const switchText = document.getElementById('authSwitchText');
+            const switchBtn = document.getElementById('authSwitch');
+
+            if (loginMode) {
+                title.textContent = 'Login';
+                submitBtn.textContent = 'Login';
+                switchText.textContent = "Don't have an account?";
+                switchBtn.textContent = 'Register';
+            } else {
+                title.textContent = 'Register';
+                submitBtn.textContent = 'Register';
+                switchText.textContent = 'Already have an account?';
+                switchBtn.textContent = 'Login';
+            }
+
+            authModal.classList.remove('hidden');
+            authModal.classList.add('flex');
+        }
+
+        function hideAuthModal() {
+            authModal.classList.add('hidden');
+            authModal.classList.remove('flex');
+            document.getElementById('authForm').reset();
+        }
+
+        function toggleAuthMode() {
+            showAuthModal(!isLoginMode);
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const loader = document.getElementById('authLoader');
+            const submitBtn = document.getElementById('authSubmitBtn');
+
+            loader.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showAlert('Logged in successfully!', 'success');
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showAlert('Account created successfully!', 'success');
+                }
+                hideAuthModal();
+            } catch (error) {
+                console.error('Auth error:', error);
+                showAlert(getErrorMessage(error.code), 'error');
+            } finally {
+                loader.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                showAlert('Logged out successfully!', 'success');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showAlert('Error logging out. Please try again.', 'error');
+            }
+        }
+
+        // Note management functions
+        async function handleAddNote(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showAlert('Please log in to create notes.', 'error');
+                return;
+            }
+
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const category = document.getElementById('noteCategory').value;
+
+            if (!title || !content) {
+                showAlert('Please fill in both title and content.', 'error');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'notes'), {
+                    title,
+                    content,
+                    category,
+                    userId: currentUser.uid,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+
+                document.getElementById('noteForm').reset();
+                showAlert('Note created successfully!', 'success');
+                loadNotes();
+            } catch (error) {
+                console.error('Error adding note:', error);
+                showAlert('Error creating note. Please try again.', 'error');
+            }
+        }
+
+        async function loadNotes() {
+            if (!currentUser) return;
+
+            try {
+                const q = query(
+                    collection(db, 'notes'),
+                    where('userId', '==', currentUser.uid),
+                    orderBy('updatedAt', 'desc')
+                );
+                const querySnapshot = await getDocs(q);
+                
+                allNotes = [];
+                querySnapshot.forEach((doc) => {
+                    allNotes.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayNotes(allNotes);
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                showAlert('Error loading notes. Please refresh the page.', 'error');
+            }
+        }
+
+        function displayNotes(notes) {
+            notesContainer.innerHTML = '';
+
+            if (notes.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            notes.forEach(note => {
+                const noteCard = createNoteCard(note);
+                notesContainer.appendChild(noteCard);
+            });
+        }
+
+        function createNoteCard(note) {
+            const card = document.createElement('div');
+            card.className = 'note-card bg-white rounded-lg shadow-md p-6 cursor-pointer';
+            
+            const categoryColors = {
+                personal: 'bg-blue-100 text-blue-800',
+                work: 'bg-green-100 text-green-800',
+                ideas: 'bg-yellow-100 text-yellow-800',
+                other: 'bg-gray-100 text-gray-800'
+            };
+
+            const date = note.updatedAt ? new Date(note.updatedAt.seconds * 1000).toLocaleDateString() : 'Today';
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${categoryColors[note.category] || categoryColors.other}">
+                        ${note.category}
+                    </span>
+                    <div class="flex space-x-2">
+                        <button onclick="editNote('${note.id}')" class="text-blue-600 hover:text-blue-800" title="Edit Note">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteNote('${note.id}')" class="text-red-600 hover:text-red-800" title="Delete Note">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">${note.title}</h3>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">${note.content}</p>
+                <div class="text-xs text-gray-500">
+                    <i class="fas fa-calendar mr-1"></i>${date}
+                </div>
+            `;
+
+            return card;
+        }
+
+        window.editNote = function(noteId) {
+            const note = allNotes.find(n => n.id === noteId);
+            if (!note) return;
+
+            editingNoteId = noteId;
+            document.getElementById('editNoteTitle').value = note.title;
+            document.getElementById('editNoteContent').value = note.content;
+            document.getElementById('editNoteCategory').value = note.category;
+
+            editModal.classList.remove('hidden');
+            editModal.classList.add('flex');
+        };
+
+        window.deleteNote = async function(noteId) {
+            if (!confirm('Are you sure you want to delete this note?')) return;
+
+            try {
+                await deleteDoc(doc(db, 'notes', noteId));
+                showAlert('Note deleted successfully!', 'success');
+                loadNotes();
+            } catch (error) {
+                console.error('Error deleting note:', error);
+                showAlert('Error deleting note. Please try again.', 'error');
+            }
+        };
+
+        function hideEditModal() {
+            editModal.classList.add('hidden');
+            editModal.classList.remove('flex');
+            editingNoteId = null;
+        }
+
+        async function handleUpdateNote(e) {
+            e.preventDefault();
+            
+            if (!editingNoteId) return;
+
+            const title = document.getElementById('editNoteTitle').value.trim();
+            const content = document.getElementById('editNoteContent').value.trim();
+            const category = document.getElementById('editNoteCategory').value;
+
+            if (!title || !content) {
+                showAlert('Please fill in both title and content.', 'error');
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'notes', editingNoteId), {
+                    title,
+                    content,
+                    category,
+                    updatedAt: new Date()
+                });
+
+                hideEditModal();
+                showAlert('Note updated successfully!', 'success');
+                loadNotes();
+            } catch (error) {
+                console.error('Error updating note:', error);
+                showAlert('Error updating note. Please try again.', 'error');
+            }
+        }
+
+        function filterNotes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCategory = document.getElementById('filterCategory').value;
+
+            let filteredNotes = allNotes;
+
+            if (searchTerm) {
+                filteredNotes = filteredNotes.filter(note => 
+                    note.title.toLowerCase().includes(searchTerm) || 
+                    note.content.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (selectedCategory !== 'all') {
+                filteredNotes = filteredNotes.filter(note => note.category === selectedCategory);
+            }
+
+            displayNotes(filteredNotes);
+        }
+
+        // Auth state observer
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                
+                if (user) {
+                    // User is signed in
+                    document.getElementById('userEmail').textContent = user.email;
+                    userInfo.classList.remove('hidden');
+                    authButtons.classList.add('hidden');
+                    welcomeSection.classList.add('hidden');
+                    notesDashboard.classList.remove('hidden');
+                    loadNotes();
+                } else {
+                    // User is signed out
+                    userInfo.classList.add('hidden');
+                    authButtons.classList.remove('hidden');
+                    welcomeSection.classList.remove('hidden');
+                    notesDashboard.classList.add('hidden');
+                    allNotes = [];
+                }
+            });
+        }
+
+        // Close modals when clicking outside
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) hideAuthModal();
+        });
+
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) hideEditModal();
+        });
+    </script>
+</body>
+</html>
