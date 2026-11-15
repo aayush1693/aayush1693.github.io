@@ -201,7 +201,7 @@
 
     /* Entries (Projects, Experience, Education) */
     .entry {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.55rem;
     }
 
     .entry:last-child {
@@ -223,6 +223,14 @@
       margin: 0;
     }
 
+    .entry-title a {
+      color: var(--text);
+    }
+
+    .entry-title a:hover {
+      color: var(--accent);
+    }
+
     .entry-org {
       color: var(--text-muted);
       font-weight: 400;
@@ -239,6 +247,17 @@
       margin: 0.2rem 0 0.45rem;
       color: var(--text);
       font-size: 0.96rem;
+    }
+
+    .entry-links {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .entry-links span.sep {
+      margin: 0 0.35rem;
+      color: var(--border);
     }
 
     .entry-bullets {
@@ -309,7 +328,7 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 0.25rem 1rem;
-      padding: 0.45rem 0;
+      padding: 0.55rem 0;
       border-bottom: 1px dashed var(--border);
       font-size: 0.95rem;
     }
@@ -318,9 +337,19 @@
       border-bottom: none;
     }
 
+    .cert-title {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .cert-title:hover {
+      color: var(--accent);
+    }
+
     .cert-issuer {
       color: var(--text-muted);
       font-size: 0.88rem;
+      margin-top: 0.1rem;
     }
 
     /* Footer */
@@ -411,7 +440,7 @@
           <span class="sep">&middot;</span>
           <a href="https://github.com/aayush1693" target="_blank" rel="noopener noreferrer">GitHub</a>
           <span class="sep">&middot;</span>
-          <a href="https://www.linkedin.com/in/aayush1693" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://linkedin.com/in/aayush1693" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <!-- Uncomment once you upload cv.pdf to your repository:
           <span class="sep">&middot;</span>
           <a href="cv.pdf" target="_blank" rel="noopener noreferrer">CV (PDF)</a>
@@ -455,12 +484,19 @@
 
       <article class="entry">
         <div class="entry-header">
-          <h3 class="entry-title">Music Genre &amp; Audio Classification Using Transformers</h3>
+          <h3 class="entry-title">
+            <a href="https://github.com/aayush1693/Music-Genre-Classification" target="_blank" rel="noopener noreferrer">
+              Music Genre Classification Using Transformers
+            </a>
+          </h3>
           <span class="entry-date">Oct 2026</span>
         </div>
         <p class="entry-desc">
           Benchmarked full fine-tuning versus linear probing of DistilHuBERT, HuBERT, and Audio Spectrogram Transformer (AST) across four audio classification benchmarks. AST achieved the strongest performance, reaching 85.2% accuracy on artist-disjoint GTZAN and 95.5% on ESC-50.
         </p>
+        <div class="entry-links">
+          Code: <a href="https://github.com/aayush1693/Music-Genre-Classification" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
         <div class="tags">
           <span class="tag">AST</span>
           <span class="tag">HuBERT</span>
@@ -471,12 +507,19 @@
 
       <article class="entry">
         <div class="entry-header">
-          <h3 class="entry-title">BERT Fine-Tuning for Emotion Classification</h3>
+          <h3 class="entry-title">
+            <a href="https://github.com/aayush1693/Fine-Tuning-BERT-for-Emotion-Classification" target="_blank" rel="noopener noreferrer">
+              BERT Fine-Tuning for Emotion Classification
+            </a>
+          </h3>
           <span class="entry-date">Apr 2026</span>
         </div>
         <p class="entry-desc">
           Fine-tuned <code>bert-base-uncased</code> on six-class emotion detection across three random seeds, achieving 92.7% accuracy and 0.884 macro-F1—outperforming a TF-IDF + logistic regression baseline by roughly 5 macro-F1 points.
         </p>
+        <div class="entry-links">
+          Code: <a href="https://github.com/aayush1693/Fine-Tuning-BERT-for-Emotion-Classification" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
         <div class="tags">
           <span class="tag">NLP</span>
           <span class="tag">BERT</span>
@@ -486,12 +529,19 @@
 
       <article class="entry">
         <div class="entry-header">
-          <h3 class="entry-title">HealthMate AI: Medical Assistant System</h3>
+          <h3 class="entry-title">
+            <a href="https://github.com/aayush1693/health-mate-ai" target="_blank" rel="noopener noreferrer">
+              HealthMate AI: Medical Assistant System
+            </a>
+          </h3>
           <span class="entry-date">Mar 2026</span>
         </div>
         <p class="entry-desc">
           Built a full-stack clinical assistant featuring CNN-based pneumonia detection from chest X-rays (89.7% accuracy, 0.979 ROC-AUC), a Gemini-powered RAG health chatbot, and hospital/doctor recommendations. Collaborated with medical students at Nepal Manipal Teaching Hospital to evaluate patient scans and curate a reliable knowledge base.
         </p>
+        <div class="entry-links">
+          Code: <a href="https://github.com/aayush1693/health-mate-ai" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
         <div class="tags">
           <span class="tag">CNN</span>
           <span class="tag">RAG</span>
@@ -503,12 +553,19 @@
 
       <article class="entry">
         <div class="entry-header">
-          <h3 class="entry-title">Qwen 2.5 3B Quantization Benchmark</h3>
+          <h3 class="entry-title">
+            <a href="https://github.com/aayush1693/Qwen-Quantization" target="_blank" rel="noopener noreferrer">
+              Qwen 2.5 3B Quantization
+            </a>
+          </h3>
           <span class="entry-date">Jan 2026</span>
         </div>
         <p class="entry-desc">
           Benchmarked 4-bit NF4 (with double quantization) and 8-bit INT8 quantization of Qwen2.5-3B on an NVIDIA Tesla T4 GPU. NF4 reduced peak VRAM usage by 65% (5.84 GB to 2.02 GB), compressed weights 3.07x, doubled usable context length to 8,192 tokens at 13.7 tokens/s without OOM errors, and retained 67.0% accuracy on an MMLU subset (within 0.3 points of FP16).
         </p>
+        <div class="entry-links">
+          Code: <a href="https://github.com/aayush1693/Qwen-Quantization" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
         <div class="tags">
           <span class="tag">LLM Quantization</span>
           <span class="tag">NF4 / INT8</span>
@@ -518,12 +575,19 @@
 
       <article class="entry">
         <div class="entry-header">
-          <h3 class="entry-title">Deepfake Speech Detection System</h3>
+          <h3 class="entry-title">
+            <a href="https://github.com/aayush1693/deepfake-speech-detection-minor-project" target="_blank" rel="noopener noreferrer">
+              Deepfake Speech Detection System
+            </a>
+          </h3>
           <span class="entry-date">Sep 2025</span>
         </div>
         <p class="entry-desc">
           Developed a full-stack system to classify audio clips as real or AI-generated using a Keras CNN trained on Mel/MFCC spectrograms, served via a Flask inference API with a Spring Boot backend and React frontend.
         </p>
+        <div class="entry-links">
+          Code: <a href="https://github.com/aayush1693/deepfake-speech-detection-minor-project" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
         <div class="tags">
           <span class="tag">Keras CNN</span>
           <span class="tag">MFCC</span>
@@ -539,8 +603,16 @@
           <span class="entry-date">Oct 2024</span>
         </div>
         <p class="entry-desc">
-          Implemented three generative pipelines: fine-tuned Stable Diffusion for text-to-image synthesis, Flux.1 (12B parameters) for complex prompts, and CogVideoX for text-to-video generation using model quantization to reduce memory footprint.
+          Built three generation pipelines: fine-tuned <a href="https://github.com/aayush1693/Stable-Diffusion-Image-Generation" target="_blank" rel="noopener noreferrer">Stable Diffusion</a> for text-to-image, <a href="https://github.com/aayush1693/Flux-Text-to-Image" target="_blank" rel="noopener noreferrer">Flux.1</a> (12B parameters) for complex prompts, and <a href="https://github.com/aayush1693/Text2Video-CogVideoX" target="_blank" rel="noopener noreferrer">CogVideoX</a> for text-to-video with model quantization to reduce memory use.
         </p>
+        <div class="entry-links">
+          Code:
+          <a href="https://github.com/aayush1693/Stable-Diffusion-Image-Generation" target="_blank" rel="noopener noreferrer">Stable Diffusion</a>
+          <span class="sep">&middot;</span>
+          <a href="https://github.com/aayush1693/Flux-Text-to-Image" target="_blank" rel="noopener noreferrer">Flux.1</a>
+          <span class="sep">&middot;</span>
+          <a href="https://github.com/aayush1693/Text2Video-CogVideoX" target="_blank" rel="noopener noreferrer">CogVideoX</a>
+        </div>
         <div class="tags">
           <span class="tag">Diffusion Models</span>
           <span class="tag">Stable Diffusion</span>
@@ -551,12 +623,19 @@
 
       <article class="entry">
         <div class="entry-header">
-          <h3 class="entry-title">Sign Language Recognition System</h3>
+          <h3 class="entry-title">
+            <a href="https://github.com/aayush1693/Sign-Language-Recognition-System" target="_blank" rel="noopener noreferrer">
+              Sign Language Recognition System
+            </a>
+          </h3>
           <span class="entry-date">Feb 2024</span>
         </div>
         <p class="entry-desc">
-          Built a CNN-based gesture classifier for recognizing sign language gestures with 92% accuracy using batch normalization and dropout regularization.
+          Built a CNN-based model for recognizing sign language gestures with 92% accuracy using batch normalization and dropout.
         </p>
+        <div class="entry-links">
+          Code: <a href="https://github.com/aayush1693/Sign-Language-Recognition-System" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
         <div class="tags">
           <span class="tag">Computer Vision</span>
           <span class="tag">CNN</span>
@@ -623,22 +702,37 @@
       <ul class="cert-list">
         <li class="cert-item">
           <div>
-            <strong>AWS Academy Graduate &ndash; Machine Learning for Natural Language Processing</strong>
-            <div class="cert-issuer">Amazon Web Services Training and Certification</div>
+            <a class="cert-title" href="https://www.credly.com/badges/a91ce35b-b9f7-48a2-a9d6-0e772beef9fa/public_url" target="_blank" rel="noopener noreferrer">
+              AWS Academy Graduate &ndash; AWS Academy Machine Learning for Natural Language Processing
+            </a>
+            <div class="cert-issuer">
+              Amazon Web Services Training and Certification &middot;
+              <a href="https://www.credly.com/badges/a91ce35b-b9f7-48a2-a9d6-0e772beef9fa/public_url" target="_blank" rel="noopener noreferrer">Verify on Credly</a>
+            </div>
           </div>
           <span class="entry-date">Jan 2025</span>
         </li>
         <li class="cert-item">
           <div>
-            <strong>AWS Academy Graduate &ndash; Machine Learning Foundations</strong>
-            <div class="cert-issuer">Amazon Web Services Training and Certification</div>
+            <a class="cert-title" href="https://www.credly.com/badges/23671e55-b674-4150-b1f7-d71cf2eeff2c/public_url" target="_blank" rel="noopener noreferrer">
+              AWS Academy Graduate &ndash; AWS Academy Machine Learning Foundations
+            </a>
+            <div class="cert-issuer">
+              Amazon Web Services Training and Certification &middot;
+              <a href="https://www.credly.com/badges/23671e55-b674-4150-b1f7-d71cf2eeff2c/public_url" target="_blank" rel="noopener noreferrer">Verify on Credly</a>
+            </div>
           </div>
           <span class="entry-date">Jan 2025</span>
         </li>
         <li class="cert-item">
           <div>
-            <strong>AWS Academy Graduate &ndash; Microservices and CI/CD Pipeline Builder</strong>
-            <div class="cert-issuer">Amazon Web Services Training and Certification</div>
+            <a class="cert-title" href="https://www.credly.com/badges/4d0eea1b-a6b3-4ad1-8110-657cf866b166/public_url" target="_blank" rel="noopener noreferrer">
+              AWS Academy Graduate &ndash; AWS Academy Microservices and CI/CD Pipeline Builder
+            </a>
+            <div class="cert-issuer">
+              Amazon Web Services Training and Certification &middot;
+              <a href="https://www.credly.com/badges/4d0eea1b-a6b3-4ad1-8110-657cf866b166/public_url" target="_blank" rel="noopener noreferrer">Verify on Credly</a>
+            </div>
           </div>
           <span class="entry-date">Dec 2024</span>
         </li>
